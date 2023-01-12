@@ -7,8 +7,8 @@ library(abind)
 library(splines)
 
 # Code for generating and fitting data
-source("~/Github/ME-Causal-Review/R/error_outcome/calibrate.R")
-source("~/Github/ME-Causal-Review/R/error_outcome/me_erf.R")
+source("~/Github/outcome_measurement_error/R/error_outcome/calibrate.R")
+source("~/Github/outcome_measurement_error/R/error_outcome/me_erf.R")
 
 ### Test RC/DR estimator
 n.sim <- 100

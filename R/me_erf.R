@@ -152,7 +152,7 @@ spl_ipw <- function(a, psi, a.vals, df = 4, se.fit = FALSE) {
   
 }
 
-# Kernel weighted least squares
+# Spline method? I am not sure what I was doing with this...
 spl_ipw2 <- function(a, psi, a.vals = NULL, df = 4, weights = NULL, se.fit = FALSE,  int.mat = NULL) {
   
   n <- length(a)
