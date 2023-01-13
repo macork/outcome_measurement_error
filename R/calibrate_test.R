@@ -5,10 +5,11 @@ rm(list = ls())
 library(parallel)
 library(abind)
 library(splines)
+library(SuperLearner)
 
 # Code for generating and fitting data
-source("~/Github/outcome_measurement_error/R/error_outcome/calibrate.R")
-source("~/Github/outcome_measurement_error/R/error_outcome/me_erf.R")
+source("~/Github/outcome_measurement_error/R/calibrate.R")
+source("~/Github/outcome_measurement_error/R/me_erf.R")
 
 ### Test RC/DR estimator
 n.sim <- 100
@@ -22,6 +23,8 @@ tau <- 0.5
 start <- Sys.time()
 
 out <- mclapply(1:n.sim, function(i, ...) {
+  
+  print(i)
   
   # covariates
   x1 <- stats::rnorm(n, 0, 1)
@@ -39,12 +42,13 @@ out <- mclapply(1:n.sim, function(i, ...) {
   
   eta_out <- 0.5 + 0.25*x[,1] - 0.75*x[,2] + 0.75*x[,3] - 0.25*x[,4] + 0.25*(a - 6)
   
-  y_true <- rnorm(n, mu_out, omega)
-  y_me <- y_true + rnorm(n, eta_out, tau)
+  y_true <- rnorm(n, mu_out, omega) # true outcome
+  y_me <- y_true + rnorm(n, eta_out, tau) # add bias to true outcome
   
-  rho <- plogis(-2 + 0.5*x[,1] - 0.5*x[,4])
+  rho <- plogis(-2 + 0.5*x[,1] - 0.5*x[,4]) # validation or test data probability (sampling score)
   val <- rbinom(n, 1, rho)
   
+  # a.vals = exposures that we want to predict ERF at
   true_erc <- sapply(a.vals, function(a.tmp, ...) {
     
     mean(2 - 0.75*x[val == 0,1] - 0.25*x[val == 0,2] + 0.25*x[val == 0,3] + 0.75*x[val == 0,4] +
@@ -68,7 +72,7 @@ out <- mclapply(1:n.sim, function(i, ...) {
   return(list(est = t(data.frame(true_erc = true_erc, naive_est = naive$estimate, adjust_est = adjust$estimate)),
               se = t(data.frame(adjust_se = adjust$se, naive_se = naive$se))))
   
-}, mc.cores = 8, mc.preschedule = TRUE)
+}, mc.cores = 1, mc.preschedule = TRUE)
 
 stop <- Sys.time()
 stop - start
